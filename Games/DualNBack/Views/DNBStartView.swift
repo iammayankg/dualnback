@@ -1,19 +1,19 @@
 import SwiftUI
 
 struct DNBStartView: View {
-    @State private var isGameActive = false
+    @StateObject private var viewModel = DNBViewModel()
 
     var body: some View {
         VStack {
-            if isGameActive {
-                DNBGameView(viewModel: DNBViewModel())
-            } else {
+            if viewModel.isGameOver {
                 Text("Dual-N-Back")
                     .font(.largeTitle)
                 Button("Start Game") {
-                    isGameActive = true
+                    viewModel.startGame()
                 }
                 .padding()
+            } else {
+                DNBGameView(viewModel: viewModel)
             }
         }
     }

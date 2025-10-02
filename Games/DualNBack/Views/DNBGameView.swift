@@ -6,34 +6,61 @@ struct DNBGameView: GameView {
     @ObservedObject var viewModel: DNBViewModel
 
     var body: some View {
-        VStack {
-            Text("Dual-N-Back")
-                .font(.largeTitle)
+        ZStack {
+            VStack {
+                // Header
+                HStack {
+                    Text("Level: \(viewModel.gameState.level)")
+                    Spacer()
+                    Text("Score: \(viewModel.score)")
+                }
+                .font(.headline)
+                .padding()
 
-            Text("Level: \(viewModel.gameState.level)")
-                .font(.title)
+                // Game Grid
+                DNBGridView(highlightedCell: viewModel.gameState.currentStimulusIndex >= 0 ? viewModel.gameState.stimulusHistory[viewModel.gameState.currentStimulusIndex].position : nil)
+                    .padding()
 
-            Text("Score: \(viewModel.score)")
-                .font(.title)
+                // Action Buttons
+                HStack(spacing: 20) {
+                    Button(action: viewModel.recordPositionMatch) {
+                        Text("Position Match")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    Button(action: viewModel.recordSoundMatch) {
+                        Text("Sound Match")
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(.bottom)
 
-            // Placeholder for the game grid
-            Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 300, height: 300)
-                .overlay(Text("Game Grid").foregroundColor(.gray))
-
-            HStack(spacing: 20) {
-                Button("Position Match", action: viewModel.recordPositionMatch)
-                Button("Sound Match", action: viewModel.recordSoundMatch)
+                // Game Controls
+                HStack {
+                    Button(viewModel.gameState.isGameActive ? "Pause" : "Resume", action: {
+                        if viewModel.gameState.isGameActive {
+                            viewModel.pauseGame()
+                        } else {
+                            viewModel.resumeGame()
+                        }
+                    })
+                    Spacer()
+                    Button("End Game", action: viewModel.endGame)
+                        .foregroundColor(.red)
+                }
+                .padding()
             }
-            .padding()
 
-            HStack {
-                Button("Pause", action: viewModel.pauseGame)
-                Button("Resume", action: viewModel.resumeGame)
-                Button("End Game", action: viewModel.endGame)
-            }
-            .padding()
+            // Visual Feedback Overlay
+            viewModel.gameState.feedback.color
+                .opacity(0.4)
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.2), value: viewModel.gameState.feedback)
         }
         .onAppear(perform: viewModel.startGame)
     }
