@@ -1,3 +1,5 @@
+#if canImport(XCTest)
+
 import XCTest
 @testable import DualNBack
 
@@ -148,3 +150,5 @@ class DNBViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.gameState.isGameActive)
     }
 }
+
+#endif
